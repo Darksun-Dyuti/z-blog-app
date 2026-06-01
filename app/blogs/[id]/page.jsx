@@ -13,6 +13,7 @@ const page = ({ params }) => {
     const { id } = React.use(params);
 
     const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const fetchBlogData = async () => {
         try {
@@ -25,6 +26,8 @@ const page = ({ params }) => {
         } catch (error) {
             console.error("Error fetching blog:", error);
             toast.error("Failed to load blog post. Please try again.");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -34,7 +37,33 @@ const page = ({ params }) => {
         }
     }, [id])
 
-    return (data ? <>
+    if (loading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-black"></div>
+                <p className="mt-4 text-black font-extrabold text-lg">Loading Blog Post...</p>
+            </div>
+        );
+    }
+
+    if (!data) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6">
+                <div className="bg-white border-2 border-black p-8 max-w-[450px] text-center shadow-[-6px_6px_0px_#000000]">
+                    <h2 className="text-2xl font-black text-black mb-4">Blog Post Not Found</h2>
+                    <p className="text-slate-700 font-medium mb-6">The article you are looking for does not exist or may have been deleted.</p>
+                    <Link href="/">
+                        <button className="bg-black text-white hover:bg-white hover:text-black border-2 border-black px-6 py-2 font-extrabold text-sm transition-all shadow-[-4px_4px_0px_#000000] active:translate-x-[2px] active:translate-y-[-2px] active:shadow-none cursor-pointer">
+                            Back to Home
+                        </button>
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <>
         <ToastContainer theme="dark" />
         <div className="bg-gray-200 py-5 px-5 md:px-12 lg:px-28">
             <div className="flex justify-between items-center">
@@ -51,14 +80,12 @@ const page = ({ params }) => {
                 <h1 className="text-2xl sm:text-5xl font-semibold max-w-[700px] mx-auto">{data.title}</h1>
                 <Image className="mx-auto mt-6 border border-white rounded-full" src={data.authorImg} width={60} height={60} alt="" />
                 <p className="mt-1 pb-2 text-lg max-w-[740px] mx-auto">
-                    <a
-                        href="https://www.linkedin.com/in/dyutimoy-bhunia-7241a1254/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-inherit no-underline hover:no-underline"
+                    <Link
+                        href="/profile"
+                        className="text-inherit font-bold underline hover:no-underline"
                     >
                         {data.author}
-                    </a>
+                    </Link>
                 </p>
 
             </div>
@@ -85,9 +112,7 @@ const page = ({ params }) => {
         </div>
 
         <Footer />
-
-    </> : <></>
-
+        </>
     );
 }
 

@@ -3,7 +3,7 @@
 import { assets } from "@/Assets/assets";
 import axios from "axios";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
 const page = () => {
@@ -16,6 +16,24 @@ const page = () => {
         author: "Dyutimoy Bhunia",
         authorImg: "/author_img.png"
     })
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const response = await axios.get("/api/profile");
+                if (response.data) {
+                    setData((prev) => ({
+                        ...prev,
+                        author: response.data.name || "Dyutimoy Bhunia",
+                        authorImg: response.data.image || "/author_img.png"
+                    }));
+                }
+            } catch (error) {
+                console.error("Error loading profile for blog creation:", error);
+            }
+        };
+        fetchProfile();
+    }, []);
 
     const onChangeHandler = (event) => {
         const name = event.target.name;

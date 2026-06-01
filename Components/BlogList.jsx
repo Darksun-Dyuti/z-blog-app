@@ -1,7 +1,10 @@
+"use client"
+
 import { blog_data } from "@/Assets/assets";
 import BlogItem from "./BlogItem";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const BlogList = () => {
 
@@ -9,8 +12,14 @@ const BlogList = () => {
     const [blogs, setBlogs] = useState([])
 
     const fetchBlogs = async () => {
-        const response = await axios.get("/api/blog");
-        setBlogs(response.data.blogs);
+        try {
+            const response = await axios.get("/api/blog");
+            setBlogs(response.data.blogs || []);
+        } catch (error) {
+            console.error("Error fetching blogs:", error);
+            toast.error("Failed to load blog posts. Please check your database connection.");
+            setBlogs([]);
+        }
     }
 
     useEffect(() => {
@@ -28,7 +37,7 @@ const BlogList = () => {
             </div>
             <div className="flex flex-wrap justify-around gap-1 gap-y-10 mb-16 xl:mx-24">
                 {blogs.filter((item) => menu === "All" ? true : item.category === menu).map((item, index) => {
-                    return <BlogItem key={index} id={item.id} image={item.image} title={item.title} description={item.description} category={item.category} />
+                    return <BlogItem key={index} id={item._id} image={item.image} title={item.title} description={item.description} category={item.category} />
                 })}
             </div>
         </div>

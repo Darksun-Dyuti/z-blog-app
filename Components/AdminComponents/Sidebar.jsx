@@ -37,6 +37,10 @@ const Sidebar = () => {
                     <Image src={assets.email_icon} alt="" width={24} className="w-5 sm:w-6" />
                     <p className="hidden sm:block text-sm md:text-base text-black">Subscriptions</p>
                 </Link>
+                <Link href="/admin/profile" className={getLinkClass("/admin/profile")}>
+                    <Image src={assets.profile_icon} alt="" width={24} className="w-5 sm:w-6 rounded-full border border-black" />
+                    <p className="hidden sm:block text-sm md:text-base text-black">Profile</p>
+                </Link>
             </div>
         </div>
     );

@@ -44,9 +44,10 @@ export async function POST(request) {
 
         const imageByteData = await image.arrayBuffer();
         const buffer = Buffer.from(imageByteData);
-        const path = `./public/${timestamp}_${image.name}`;
+        const nameWithNoSpaces = image.name.replace(/\s+/g, '_');
+        const path = `./public/${timestamp}_${nameWithNoSpaces}`;
         await writeFile(path, buffer);
-        const imgUrl = `/${timestamp}_${image.name}`;
+        const imgUrl = `/${timestamp}_${nameWithNoSpaces}`;
 
         const blogData = {
             title: `${formData.get('title')}`,
