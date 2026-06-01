@@ -4,30 +4,30 @@ import { assets } from "@/Assets/assets";
 import Image from "next/image";
 
 const BlogTableItem = ({ authorImg, title, author, date, deleteBlog, mongoId }) => {
-
     const BlogDate = new Date(date);
 
     return (
-        <tr className="bg-white border-b">
-            <th scope="row" className="items-center gap-3 hidden sm:flex px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                <Image src={authorImg ? authorImg : assets.profile_icon} className="rounded-full border border-gray-300" width={40} height={40} alt="" />
-                <p>{author ? author : "No author"}</p>
-            </th>
-            <td className="px-6 py-4">
+        <tr className="bg-white hover:bg-slate-50 transition-colors">
+            <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap">
+                <div className="flex items-center gap-3">
+                    <Image src={authorImg ? authorImg : assets.profile_icon} className="rounded-full border-2 border-black" width={36} height={36} alt="" />
+                    <p className="font-extrabold text-black text-xs sm:text-sm">{author ? author : "No author"}</p>
+                </div>
+            </td>
+            <td className="px-6 py-4 font-extrabold text-black text-xs sm:text-sm">
                 {title ? title : "No title"}
             </td>
-            <td className="px-6 py-4">
+            <td className="px-6 py-4 font-bold text-slate-700 text-xs sm:text-sm whitespace-nowrap">
                 {BlogDate.toDateString()}
             </td>
-            <td>
-  <button 
-    onClick={() => deleteBlog(mongoId)}
-    className="cursor-pointer bg-red-500 text-white px-2 py-1 rounded"
-  >
-    x
-  </button>
-</td>
-
+            <td className="px-6 py-4 whitespace-nowrap">
+                <button 
+                    onClick={() => deleteBlog(mongoId)}
+                    className="cursor-pointer bg-[#ff1744] text-white border-2 border-black px-3 py-1 font-black text-xs shadow-[-2px_2px_0px_#000000] hover:bg-white hover:text-black hover:translate-x-[1px] hover:translate-y-[-1px] hover:shadow-none active:translate-x-0 active:translate-y-0 transition-all duration-100"
+                >
+                    DELETE
+                </button>
+            </td>
         </tr>
     );
 }

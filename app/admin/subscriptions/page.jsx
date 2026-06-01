@@ -46,35 +46,24 @@ const page = () => {
 
 
     return (
-        <div className="flex-1 pt-5 px-5 sm:pt-12 sm:pl-16">
-            <h1>All Subscription</h1>
-            <div className="relative max-w-[600px] h-[80vh] overflow-x-auto mt-4 border border-gray-400 scrollbar-hide">
-                <table className="w-full text-sm text-gray-500">
-
-                    <thead className="text-xs text-left text-gray-700 uppercase bg-gray-500">
+        <div className="bg-slate-50 min-h-screen p-6 sm:p-10 border-t-2 border-black w-full">
+            <h1 className="text-3xl font-black text-black mb-6">Email Subscriptions</h1>
+            <div className="relative max-w-[650px] overflow-x-auto border-2 border-black bg-white shadow-[-8px_8px_0px_#000000] scrollbar-hide">
+                <table className="w-full text-sm text-black border-collapse">
+                    <thead className="text-xs text-left text-white uppercase bg-black border-b-2 border-black">
                         <tr>
-                            <th scope="col" className="px-6 py-3">
-                                Email Subscription
-                            </th>
-                            <th scope="col" className="hidden sm:block px-6 py-3">
-                                Date
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Action
-                            </th>
+                            <th scope="col" className="px-6 py-4 font-black">Email</th>
+                            <th scope="col" className="hidden sm:table-cell px-6 py-4 font-black">Date</th>
+                            <th scope="col" className="px-6 py-4 font-black">Action</th>
                         </tr>
                     </thead>
-
-                    <tbody>
+                    <tbody className="divide-y-2 divide-black">
                         {emails.map((item, index) => {
-                            console.log("email", item)
-
                             return (
                                 <SubsTableItem key={index} mongoId={item._id} deleteEmail={deleteEmail} email={item.email} date={item.date} />
                             )
                         })}
                     </tbody>
-
                 </table>
             </div>
         </div>

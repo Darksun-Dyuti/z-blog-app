@@ -42,28 +42,24 @@ const page = () => {
 
 
     return (
-        <div className="flex-1 pt-5 px-5 sm:pt-12 sm:pl-16">
-            All blogs
-            <div className="relative h-[80vh] max-w-[850px] overflow-x-auto mt-4 border border-gray-400 scrollbar scrollbar-hide">
-
-                <table className="w-full text-sm text-gray-500">
-                    <thead className="text-sm text-gray-700 text-left uppercase bg-gray-50">
+        <div className="bg-slate-50 min-h-screen p-6 sm:p-10 border-t-2 border-black w-full">
+            <h1 className="text-3xl font-black text-black mb-6">Manage Blogs</h1>
+            <div className="relative max-w-[850px] overflow-x-auto border-2 border-black bg-white shadow-[-8px_8px_0px_#000000] scrollbar-hide">
+                <table className="w-full text-sm text-black border-collapse">
+                    <thead className="text-xs text-left text-white uppercase bg-black border-b-2 border-black">
                         <tr>
-                            <th scope="col" className="hidden sm:block px-6 py-3">Author name</th>
-                            <th scope="col" className="px-6 py-3">Blog Title</th>
-                            <th scope="col" className="px-6 py-3">Date</th>
-                            <th scope="col" className="px-6 py-3">Action</th>
+                            <th scope="col" className="hidden sm:table-cell px-6 py-4 font-black">Author</th>
+                            <th scope="col" className="px-6 py-4 font-black">Blog Title</th>
+                            <th scope="col" className="px-6 py-4 font-black">Date</th>
+                            <th scope="col" className="px-6 py-4 font-black">Action</th>
                         </tr>
                     </thead>
-
-                    <tbody>
-                        {blogs.map((item,index) => {
+                    <tbody className="divide-y-2 divide-black">
+                        {blogs.map((item, index) => {
                             return <BlogTableItem key={index} mongoId={item._id} title={item.title} author={item.author} authorImg={item.authorImg} date={item.date} deleteBlog={deleteBlog} />
                         })}
                     </tbody>
-
                 </table>
-
             </div>
         </div>
     );
