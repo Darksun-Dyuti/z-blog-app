@@ -1,36 +1,41 @@
 "use client"
 
+import React, { useEffect, useState } from "react";
 import { assets, blog_data } from "@/Assets/assets";
 import Footer from "@/Components/Footer";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const page = ({ params }) => {
     const { id } = React.use(params);
 
     const [data, setData] = useState(null);
 
-
     const fetchBlogData = async () => {
-        const response = await axios.get("/api/blog", {
-            params: {
-                id: id
-            }
-        });
-        setData(response.data);
-
+        try {
+            const response = await axios.get("/api/blog", {
+                params: {
+                    id: id
+                }
+            });
+            setData(response.data);
+        } catch (error) {
+            console.error("Error fetching blog:", error);
+            toast.error("Failed to load blog post. Please try again.");
+        }
     }
 
     useEffect(() => {
-        fetchBlogData()
-    }, [])
-
-
-
+        if (id) {
+            fetchBlogData();
+        }
+    }, [id])
 
     return (data ? <>
+        <ToastContainer theme="dark" />
         <div className="bg-gray-200 py-5 px-5 md:px-12 lg:px-28">
             <div className="flex justify-between items-center">
                 <Link href="/">

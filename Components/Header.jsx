@@ -17,15 +17,21 @@ const Header = () => {
             return;
         }
 
-        const formData = new FormData();
-        formData.append("email", email);
-        const response = await axios.post('/api/email', formData);
+        try {
+            const formData = new FormData();
+            formData.append("email", email);
+            const response = await axios.post('/api/email', formData);
 
-        if (response.data.success) {
-            toast.success(response.data.msg);
-            setEmail("");
-        } else {
-            toast.error("Error");
+            if (response.data.success) {
+                toast.success(response.data.msg);
+                setEmail("");
+            } else {
+                toast.error(response.data.msg || "Error");
+            }
+        } catch (error) {
+            console.error("Subscription error:", error);
+            const errMsg = error.response?.data?.msg || "Failed to subscribe. Please try again.";
+            toast.error(errMsg);
         }
     }
 

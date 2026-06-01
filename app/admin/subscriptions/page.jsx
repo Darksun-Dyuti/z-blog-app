@@ -10,23 +10,33 @@ const page = () => {
     const [emails, setEmails] = useState([]);
 
     const fetchEmails = async () => {
-        const response = await axios.get('/api/email');
-        console.log("response", response.data)
-        setEmails(response.data.emails)
+        try {
+            const response = await axios.get('/api/email');
+            setEmails(response.data.emails || []);
+        } catch (error) {
+            console.error("Error fetching emails:", error);
+            toast.error("Failed to fetch subscriptions list");
+        }
     }
 
     const deleteEmail = async (mongoId) => {
-        const response = await axios.delete('/api/email', {
-            params: {
-                id: mongoId
+        try {
+            const response = await axios.delete('/api/email', {
+                params: {
+                    id: mongoId
+                }
+            })
+            if (response.data.success) {
+                toast.success(response.data.msg);
+                fetchEmails();
             }
-        })
-        if (response.data.success) {
-            toast.success(response.data.msg);
-            fetchEmails();
-        }
-        else {
-            toast.error("Error");
+            else {
+                toast.error(response.data.msg || "Error");
+            }
+        } catch (error) {
+            console.error("Error deleting email:", error);
+            const errMsg = error.response?.data?.msg || "Failed to delete subscription";
+            toast.error(errMsg);
         }
     }
 

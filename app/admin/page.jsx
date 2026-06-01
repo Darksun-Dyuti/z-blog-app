@@ -145,7 +145,7 @@ const AdminDashboard = () => {
                   </div>
                 </a>
                 <a
-                  href="/admin/blogList"
+                  href="/admin/bloglist"
                   className="flex items-center gap-4 p-4 rounded-xl hover:bg-gradient-to-r hover:from-emerald-50 hover:to-green-50 transition-all duration-200 group border border-transparent hover:border-emerald-200"
                 >
                   <div className="p-2 bg-emerald-100 rounded-lg group-hover:bg-emerald-200 transition-colors">
@@ -217,7 +217,7 @@ const AdminDashboard = () => {
               <h2 className="text-2xl font-bold text-slate-800">Latest Blog Posts</h2>
             </div>
             <a
-              href="/admin/blogList"
+              href="/admin/bloglist"
               className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 font-medium"
             >
               <span>View All</span>
