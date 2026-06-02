@@ -2,6 +2,8 @@ import { ConnectDB } from "@/lib/config/db";
 import ProfileModel from "@/lib/models/ProfileModel";
 import { NextResponse } from "next/server";
 import { writeFile } from 'fs/promises';
+import path from "path";
+import { verifyAdminSession } from "@/lib/utils/auth";
 
 export async function GET(request) {
     try {
@@ -26,6 +28,16 @@ export async function GET(request) {
 export async function POST(request) {
     try {
         await ConnectDB();
+
+        // Security: Verify Admin Session
+        const isAuthed = await verifyAdminSession(request);
+        if (!isAuthed) {
+            return NextResponse.json(
+                { success: false, msg: "Unauthorized" },
+                { status: 401 }
+            );
+        }
+        
         const formData = await request.formData();
         const name = formData.get('name');
         const bio = formData.get('bio');
@@ -44,10 +56,13 @@ export async function POST(request) {
             const timestamp = Date.now();
             const imageByteData = await image.arrayBuffer();
             const buffer = Buffer.from(imageByteData);
-            const nameWithNoSpaces = image.name.replace(/\s+/g, '_');
-            const path = `./public/${timestamp}_${nameWithNoSpaces}`;
-            await writeFile(path, buffer);
-            updateData.image = `/${timestamp}_${nameWithNoSpaces}`;
+            
+            // Security: Sanitize filename to prevent directory traversal
+            const baseName = path.basename(image.name || "avatar.png");
+            const safeName = baseName.replace(/[^a-zA-Z0-9._-]/g, "_");
+            const savePath = `./public/${timestamp}_${safeName}`;
+            await writeFile(savePath, buffer);
+            updateData.image = `/${timestamp}_${safeName}`;
         }
 
         let profile = await ProfileModel.findOne();

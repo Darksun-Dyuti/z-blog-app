@@ -3,6 +3,8 @@ import { NextResponse } from "next/server"
 import { writeFile } from 'fs/promises'
 import BlogModel from "@/lib/models/BlogModel"
 import fs from 'fs'
+import path from "path"
+import { verifyAdminSession } from "@/lib/utils/auth"
 
 // API Endpoint to get all blogs
 export async function GET(request) {
@@ -30,6 +32,15 @@ export async function GET(request) {
 export async function POST(request) {
     try {
         await ConnectDB();
+
+        // Security: Verify Admin Session
+        const isAuthed = await verifyAdminSession(request);
+        if (!isAuthed) {
+            return NextResponse.json(
+                { success: false, msg: "Unauthorized" },
+                { status: 401 }
+            );
+        }
         
         const formData = await request.formData();
         const timestamp = Date.now();
@@ -44,10 +55,13 @@ export async function POST(request) {
 
         const imageByteData = await image.arrayBuffer();
         const buffer = Buffer.from(imageByteData);
-        const nameWithNoSpaces = image.name.replace(/\s+/g, '_');
-        const path = `./public/${timestamp}_${nameWithNoSpaces}`;
-        await writeFile(path, buffer);
-        const imgUrl = `/${timestamp}_${nameWithNoSpaces}`;
+        
+        // Security: Sanitize filename to prevent directory traversal
+        const baseName = path.basename(image.name || "image.png");
+        const safeName = baseName.replace(/[^a-zA-Z0-9._-]/g, "_");
+        const savePath = `./public/${timestamp}_${safeName}`;
+        await writeFile(savePath, buffer);
+        const imgUrl = `/${timestamp}_${safeName}`;
 
         const blogData = {
             title: `${formData.get('title')}`,
@@ -76,6 +90,15 @@ export async function POST(request) {
 export async function DELETE(request){
     try {
         await ConnectDB();
+
+        // Security: Verify Admin Session
+        const isAuthed = await verifyAdminSession(request);
+        if (!isAuthed) {
+            return NextResponse.json(
+                { success: false, msg: "Unauthorized" },
+                { status: 401 }
+            );
+        }
         
         const id = await request.nextUrl.searchParams.get('id')
         console.log(id)
@@ -83,7 +106,17 @@ export async function DELETE(request){
         if (!blog) {
             return NextResponse.json({msg: "Blog not found"}, { status: 404 });
         }
-        fs.unlink(`./public${blog.image}`, ()=>{});
+        
+        // Security: Safely unlink file if it exists
+        const fileToDelete = `./public${blog.image}`;
+        if (fs.existsSync(fileToDelete)) {
+            try {
+                fs.unlinkSync(fileToDelete);
+            } catch (unlinkErr) {
+                console.error("Error unlinking image file:", unlinkErr);
+            }
+        }
+        
         await BlogModel.findByIdAndDelete(id);
         return NextResponse.json({msg:"blog Deleted"});
     } catch (error) {

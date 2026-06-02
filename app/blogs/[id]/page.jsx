@@ -129,7 +129,7 @@ const Page = ({ params }) => {
 
             <div className="max-w-[800px] mx-auto mt-[-100px] mb-10 px-5 relative z-10">
                 <div className="relative w-full aspect-video border-4 border-white dark:border-zinc-800 shadow-[-10px_10px_0px_#000000] dark:shadow-[-10px_10px_0px_#ffffff] overflow-hidden">
-                    <Image src={data.image} fill className="object-cover" alt="Blog Main Visual" priority />
+                    <Image src={data.image} fill className="object-cover" alt={data.title || "Blog Main Cover Image"} priority />
                 </div>
                 
                 <div 
@@ -140,9 +140,33 @@ const Page = ({ params }) => {
                 <div className="my-16">
                     <p className="text-black dark:text-zinc-100 font-extrabold text-lg mb-4">Share this article on social media</p>
                     <div className="flex gap-3">
-                        <Image src={assets.facebook_icon} width={50} alt="Facebook" className="cursor-pointer hover:scale-105 transition-transform" />
-                        <Image src={assets.twitter_icon} width={50} alt="Twitter" className="cursor-pointer hover:scale-105 transition-transform" />
-                        <Image src={assets.googleplus_icon} width={50} alt="Google Plus" className="cursor-pointer hover:scale-105 transition-transform" />
+                        <a 
+                            href={`https://www.facebook.com/sharer/sharer.php?u=${typeof window !== 'undefined' ? encodeURIComponent(window.location.href) : ""}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            aria-label="Share on Facebook"
+                            className="hover:scale-105 transition-transform inline-block"
+                        >
+                            <Image src={assets.facebook_icon} width={50} alt="Facebook" />
+                        </a>
+                        <a 
+                            href={`https://twitter.com/intent/tweet?url=${typeof window !== 'undefined' ? encodeURIComponent(window.location.href) : ""}&text=${encodeURIComponent(data.title)}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            aria-label="Share on Twitter"
+                            className="hover:scale-105 transition-transform inline-block"
+                        >
+                            <Image src={assets.twitter_icon} width={50} alt="Twitter" />
+                        </a>
+                        <a 
+                            href={`https://plus.google.com/share?url=${typeof window !== 'undefined' ? encodeURIComponent(window.location.href) : ""}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            aria-label="Share on Google Plus"
+                            className="hover:scale-105 transition-transform inline-block"
+                        >
+                            <Image src={assets.googleplus_icon} width={50} alt="Google Plus" />
+                        </a>
                     </div>
                 </div>
             </div>

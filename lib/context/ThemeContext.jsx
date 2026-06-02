@@ -2,43 +2,73 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 const ThemeContext = createContext({
-  theme: "light",
+  theme: "system",
+  resolvedTheme: "light",
   toggleTheme: () => {},
+  setTheme: (theme) => {},
 });
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState("system");
+  const [resolvedTheme, setResolvedTheme] = useState("light");
 
   useEffect(() => {
-    // Initial check (needs to run in useEffect so it is client-only)
     const storedTheme = localStorage.getItem("theme");
-    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    const activeTheme = storedTheme || systemTheme;
-    
-    setTheme(activeTheme);
-    if (activeTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    const initialTheme = (storedTheme === "light" || storedTheme === "dark" || storedTheme === "system")
+      ? storedTheme
+      : "system";
+    setTheme(initialTheme);
   }, []);
 
-  const toggleTheme = () => {
-    const nextTheme = theme === "light" ? "dark" : "light";
-    setTheme(nextTheme);
-    localStorage.setItem("theme", nextTheme);
-    if (nextTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
+  useEffect(() => {
+    const root = document.documentElement;
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    const applyTheme = () => {
+      let activeTheme = theme;
+      if (theme === "system") {
+        activeTheme = mediaQuery.matches ? "dark" : "light";
+      }
+      setResolvedTheme(activeTheme);
+
+      if (activeTheme === "dark") {
+        root.classList.add("dark");
+      } else {
+        root.classList.remove("dark");
+      }
+    };
+
+    applyTheme();
+
+    if (theme === "system") {
+      mediaQuery.addEventListener("change", applyTheme);
+      return () => mediaQuery.removeEventListener("change", applyTheme);
+    }
+  }, [theme]);
+
+  const changeTheme = (newTheme) => {
+    if (newTheme === "light" || newTheme === "dark" || newTheme === "system") {
+      setTheme(newTheme);
+      localStorage.setItem("theme", newTheme);
     }
   };
 
+  const toggleTheme = () => {
+    const cycle = {
+      light: "dark",
+      dark: "system",
+      system: "light"
+    };
+    const nextTheme = cycle[theme] || "light";
+    changeTheme(nextTheme);
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, resolvedTheme, toggleTheme, setTheme: changeTheme }}>
       {children}
     </ThemeContext.Provider>
   );
 };
 
 export const useTheme = () => useContext(ThemeContext);
+

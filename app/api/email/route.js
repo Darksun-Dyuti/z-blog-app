@@ -1,6 +1,7 @@
 import { ConnectDB } from "@/lib/config/db"
 import EmailModel from "@/lib/models/EmailModel";
 import { NextResponse } from "next/server";
+import { verifyAdminSession } from "@/lib/utils/auth";
 
 export async function POST (request){
     try {
@@ -26,6 +27,16 @@ export async function POST (request){
 export async function GET(request){
     try {
         await ConnectDB();
+
+        // Security: Verify Admin Session
+        const isAuthed = await verifyAdminSession(request);
+        if (!isAuthed) {
+            return NextResponse.json(
+                { success: false, msg: "Unauthorized" },
+                { status: 401 }
+            );
+        }
+
         const emails = await EmailModel.find({});
         return NextResponse.json({emails});
     } catch (error) {
@@ -37,6 +48,16 @@ export async function GET(request){
 export async function DELETE(request){
     try {
         await ConnectDB();
+
+        // Security: Verify Admin Session
+        const isAuthed = await verifyAdminSession(request);
+        if (!isAuthed) {
+            return NextResponse.json(
+                { success: false, msg: "Unauthorized" },
+                { status: 401 }
+            );
+        }
+
         const id = request.nextUrl.searchParams.get('id')
         if (!id) {
             return NextResponse.json({ success: false, msg: "ID is required" }, { status: 400 });
