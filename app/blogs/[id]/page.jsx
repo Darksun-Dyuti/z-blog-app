@@ -1,28 +1,36 @@
 "use client"
 
 import React, { useEffect, useState } from "react";
-import { assets, blog_data } from "@/Assets/assets";
+import { assets } from "@/Assets/assets";
 import Footer from "@/Components/Footer";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useTheme } from "@/lib/context/ThemeContext";
+import ThemeToggle from "@/Components/ThemeToggle";
+import { DetailSkeleton } from "@/Components/SkeletonLoader";
 
-const page = ({ params }) => {
+const Page = ({ params }) => {
     const { id } = React.use(params);
+    const { theme } = useTheme();
 
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
 
     const fetchBlogData = async () => {
         try {
+            setLoading(true);
             const response = await axios.get("/api/blog", {
                 params: {
                     id: id
                 }
             });
             setData(response.data);
+            if (response.data && response.data.title) {
+                document.title = `${response.data.title} - Blogger`;
+            }
         } catch (error) {
             console.error("Error fetching blog:", error);
             toast.error("Failed to load blog post. Please try again.");
@@ -35,25 +43,47 @@ const page = ({ params }) => {
         if (id) {
             fetchBlogData();
         }
-    }, [id])
+    }, [id]);
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-black"></div>
-                <p className="mt-4 text-black font-extrabold text-lg">Loading Blog Post...</p>
+            <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 text-black dark:text-zinc-100 flex flex-col justify-between transition-colors">
+                <div>
+                    <div className="bg-gray-200 dark:bg-zinc-900 py-5 px-5 md:px-12 lg:px-28 border-b-2 border-black dark:border-zinc-800 transition-colors">
+                        <div className="flex justify-between items-center">
+                            <Link href="/">
+                                <Image src={theme === "dark" ? assets.logo_light : assets.logo} width={180} alt="Logo" className="w-[130px] sm:w-auto" />
+                            </Link>
+                            <div className="flex items-center gap-4">
+                                <ThemeToggle />
+                                <Link href="/admin">
+                                    <button className="cursor-pointer flex items-center gap-2 font-black py-1 px-3 sm:py-3 sm:px-6 border-2 border-black dark:border-white bg-white dark:bg-zinc-800 text-black dark:text-zinc-100 shadow-[-7px_7px_0px_#000000] dark:shadow-[-7px_7px_0px_#ffffff] hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-none dark:hover:shadow-none transition-all duration-200 text-xs sm:text-sm">
+                                        Dashboard
+                                        <Image src={assets.arrow} alt="" className="dark:invert" />
+                                    </button>
+                                </Link>
+                            </div>
+                        </div>
+                        <div className="text-center my-24">
+                            <div className="h-10 bg-slate-300 dark:bg-zinc-800 w-3/4 mx-auto mb-4 animate-pulse"></div>
+                            <div className="w-16 h-16 rounded-full bg-slate-300 dark:bg-zinc-800 mx-auto animate-pulse"></div>
+                        </div>
+                    </div>
+                    <DetailSkeleton />
+                </div>
+                <Footer />
             </div>
         );
     }
 
     if (!data) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6">
-                <div className="bg-white border-2 border-black p-8 max-w-[450px] text-center shadow-[-6px_6px_0px_#000000]">
-                    <h2 className="text-2xl font-black text-black mb-4">Blog Post Not Found</h2>
-                    <p className="text-slate-700 font-medium mb-6">The article you are looking for does not exist or may have been deleted.</p>
+            <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 dark:bg-zinc-950 p-6 transition-colors">
+                <div className="bg-white dark:bg-zinc-900 border-2 border-black dark:border-white p-8 max-w-[450px] text-center shadow-[-6px_6px_0px_#000000] dark:shadow-[-6px_6px_0px_#ffffff]">
+                    <h2 className="text-2xl font-black text-black dark:text-zinc-100 mb-4">Blog Post Not Found</h2>
+                    <p className="text-slate-700 dark:text-zinc-300 font-medium mb-6">The article you are looking for does not exist or may have been deleted.</p>
                     <Link href="/">
-                        <button className="bg-black text-white hover:bg-white hover:text-black border-2 border-black px-6 py-2 font-extrabold text-sm transition-all shadow-[-4px_4px_0px_#000000] active:translate-x-[2px] active:translate-y-[-2px] active:shadow-none cursor-pointer">
+                        <button className="cursor-pointer bg-black text-white hover:bg-white hover:text-black border-2 border-black dark:border-white px-6 py-2 font-extrabold text-sm transition-all shadow-[-4px_4px_0px_#000000] dark:shadow-[-4px_4px_0px_#ffffff] active:translate-x-[2px] active:translate-y-[-2px] active:shadow-none">
                             Back to Home
                         </button>
                     </Link>
@@ -63,57 +93,63 @@ const page = ({ params }) => {
     }
 
     return (
-        <>
-        <ToastContainer theme="dark" />
-        <div className="bg-gray-200 py-5 px-5 md:px-12 lg:px-28">
-            <div className="flex justify-between items-center">
-                <Link href="/">
-                    <Image src={assets.logo} width={180} alt="" className="w-[130px] sm:w-auto" />
-                </Link>
-                <button className="flex items-center gap-2 font-medium py-1 px-3 sm:py-3 sm:px-6 border border-black shadow-[-7px_7px_0px_#000000]">
-                    Get started
-                    <Image src={assets.arrow} alt="" />
-                </button>
-            </div>
-
-            <div className="text-center my-24">
-                <h1 className="text-2xl sm:text-5xl font-semibold max-w-[700px] mx-auto">{data.title}</h1>
-                <Image className="mx-auto mt-6 border border-white rounded-full" src={data.authorImg} width={60} height={60} alt="" />
-                <p className="mt-1 pb-2 text-lg max-w-[740px] mx-auto">
-                    <Link
-                        href="/profile"
-                        className="text-inherit font-bold underline hover:no-underline"
-                    >
-                        {data.author}
+        <div className="bg-slate-50 dark:bg-zinc-950 text-black dark:text-zinc-100 min-h-screen transition-colors">
+            <ToastContainer theme={theme === "dark" ? "dark" : "light"} />
+            <div className="bg-gray-200 dark:bg-zinc-900 py-5 px-5 md:px-12 lg:px-28 border-b-2 border-black dark:border-zinc-800 transition-colors">
+                <div className="flex justify-between items-center">
+                    <Link href="/">
+                        <Image src={theme === "dark" ? assets.logo_light : assets.logo} width={180} alt="Blogger Logo" className="w-[130px] sm:w-auto" />
                     </Link>
-                </p>
+                    <div className="flex items-center gap-4">
+                        <ThemeToggle />
+                        <Link href="/admin">
+                            <button className="cursor-pointer flex items-center gap-2 font-black py-1 px-3 sm:py-3 sm:px-6 border-2 border-black dark:border-white bg-white dark:bg-zinc-800 text-black dark:text-zinc-100 shadow-[-7px_7px_0px_#000000] dark:shadow-[-7px_7px_0px_#ffffff] hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-none dark:hover:shadow-none transition-all duration-200 text-xs sm:text-sm">
+                                Dashboard
+                                <Image src={assets.arrow} alt="" className="dark:invert" />
+                            </button>
+                        </Link>
+                    </div>
+                </div>
 
-            </div>
-        </div>
-
-        <div className="max-w-[800px] md:mx-auto mt-[-100px] mb-10">
-            <Image className="border-4 border-white" src={data.image} width={1280} height={720} alt="" />
-            
-            
-           <div className="blog-content" dangerouslySetInnerHTML={{__html:data.description}}>
-
-           </div>
-
-
-            <div className="my-24">
-                <p className="text-black font-semibold my-4">Share this article on social media</p>
-                <div className="flex">
-                    <Image src={assets.facebook_icon} width={50} alt="" />
-                    <Image src={assets.twitter_icon} width={50} alt="" />
-                    <Image src={assets.googleplus_icon} width={50} alt="" />
+                <div className="text-center my-24">
+                    <h1 className="text-2xl sm:text-5xl font-black max-w-[700px] mx-auto text-black dark:text-zinc-100">{data.title}</h1>
+                    <div className="relative mx-auto mt-6 border-2 border-black dark:border-white rounded-full overflow-hidden w-[60px] h-[60px] shadow-[-3px_3px_0px_#000000] dark:shadow-[-3px_3px_0px_#ffffff]">
+                        <Image src={data.authorImg} fill className="object-cover" alt={data.author} />
+                    </div>
+                    <p className="mt-2 pb-2 text-lg max-w-[740px] mx-auto">
+                        <Link
+                            href="/profile"
+                            className="text-inherit font-black underline hover:no-underline hover:text-[#ffc400] transition-colors"
+                        >
+                            {data.author}
+                        </Link>
+                    </p>
                 </div>
             </div>
 
-        </div>
+            <div className="max-w-[800px] mx-auto mt-[-100px] mb-10 px-5 relative z-10">
+                <div className="relative w-full aspect-video border-4 border-white dark:border-zinc-800 shadow-[-10px_10px_0px_#000000] dark:shadow-[-10px_10px_0px_#ffffff] overflow-hidden">
+                    <Image src={data.image} fill className="object-cover" alt="Blog Main Visual" priority />
+                </div>
+                
+                <div 
+                    className="blog-content mt-12 text-slate-800 dark:text-zinc-200 text-base sm:text-lg font-medium leading-relaxed border-b-2 border-black dark:border-zinc-800 pb-12" 
+                    dangerouslySetInnerHTML={{__html: data.description}}
+                ></div>
 
-        <Footer />
-        </>
+                <div className="my-16">
+                    <p className="text-black dark:text-zinc-100 font-extrabold text-lg mb-4">Share this article on social media</p>
+                    <div className="flex gap-3">
+                        <Image src={assets.facebook_icon} width={50} alt="Facebook" className="cursor-pointer hover:scale-105 transition-transform" />
+                        <Image src={assets.twitter_icon} width={50} alt="Twitter" className="cursor-pointer hover:scale-105 transition-transform" />
+                        <Image src={assets.googleplus_icon} width={50} alt="Google Plus" className="cursor-pointer hover:scale-105 transition-transform" />
+                    </div>
+                </div>
+            </div>
+
+            <Footer />
+        </div>
     );
 }
 
-export default page;
+export default Page;
