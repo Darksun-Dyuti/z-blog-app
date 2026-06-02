@@ -242,7 +242,7 @@ const AdminDashboard = () => {
                   <h3 className="font-extrabold text-black mb-2 line-clamp-2 text-lg group-hover:text-[#2979ff] transition-colors">
                     {blog.title}
                   </h3>
-                  <p className="text-slate-700 text-xs mb-4 line-clamp-2 leading-relaxed" dangerouslySetInnerHTML={{__html: blog.description}}></p>
+                  <div className="text-slate-700 text-xs mb-4 line-clamp-2 leading-relaxed" dangerouslySetInnerHTML={{__html: blog.description}}></div>
                   <div className="flex items-center justify-between border-t border-black pt-3">
                     <div className="flex items-center gap-2">
                       <FiCalendar className="w-3.5 h-3.5 text-slate-500" />
