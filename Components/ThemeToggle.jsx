@@ -1,7 +1,7 @@
 "use client"
 import React from "react";
 import { useTheme } from "@/lib/context/ThemeContext";
-import { FiSun, FiMoon, FiMonitor } from "react-icons/fi";
+import { FiSun, FiMoon } from "react-icons/fi";
 
 const ThemeToggle = () => {
   const { theme, toggleTheme } = useTheme();
@@ -12,8 +12,6 @@ const ThemeToggle = () => {
         return <FiSun className="w-5 h-5" />;
       case "dark":
         return <FiMoon className="w-5 h-5" />;
-      case "system":
-        return <FiMonitor className="w-5 h-5" />;
       default:
         return <FiSun className="w-5 h-5" />;
     }

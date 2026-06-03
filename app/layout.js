@@ -17,24 +17,22 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  const theme = localStorage.getItem('theme');
-                  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                  const activeTheme = (theme === 'system' || !theme) ? systemTheme : theme;
-                  if (activeTheme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                  } else {
-                    document.documentElement.classList.remove('dark');
-                  }
-                } catch (e) {}
-              })();
-            `
-          }}
-        />
+        <script>
+          {`
+            (function() {
+              try {
+                const theme = localStorage.getItem('theme');
+                const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                const activeTheme = (theme === 'light' || theme === 'dark') ? theme : systemTheme;
+                if (activeTheme === 'dark') {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+              } catch (e) {}
+            })();
+          `}
+        </script>
       </head>
       <body
         className={`${outfit.variable} antialiased bg-slate-50 text-black dark:bg-zinc-950 dark:text-zinc-100`}
